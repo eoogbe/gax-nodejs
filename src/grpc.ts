@@ -31,14 +31,14 @@
  */
 
 import * as grpcProtoLoader from '@grpc/proto-loader';
-import * as fs from 'fs';
+// import * as fs from 'fs';
 import {GoogleAuth, GoogleAuthOptions} from 'google-auth-library';
 import * as grpc from '@grpc/grpc-js';
 import {OutgoingHttpHeaders} from 'http';
 import * as path from 'path';
 import * as protobuf from 'protobufjs';
 import * as semver from 'semver';
-import * as walk from 'walkdir';
+// import * as walk from 'walkdir';
 
 import * as gax from './gax';
 
@@ -50,10 +50,10 @@ INCLUDE_DIRS.push(googleProtoFilesDir);
 
 // COMMON_PROTO_FILES logic is here for protobufjs loads (see
 // GoogleProtoFilesRoot below)
-const COMMON_PROTO_FILES = walk
-  .sync(googleProtoFilesDir)
-  .filter(f => path.extname(f) === '.proto')
-  .map(f => path.normalize(f).substring(googleProtoFilesDir.length + 1));
+// const COMMON_PROTO_FILES = walk
+//   .sync(googleProtoFilesDir)
+//   .filter(f => path.extname(f) === '.proto')
+//   .map(f => path.normalize(f).substring(googleProtoFilesDir.length + 1));
 
 export interface GrpcClientOptions extends GoogleAuthOptions {
   auth?: GoogleAuth;
@@ -190,14 +190,14 @@ export class GrpcClient {
     return this.loadFromProto(filename, options);
   }
 
-  static _resolveFile(protoPath: string, filename: string) {
-    if (fs.existsSync(path.join(protoPath, filename))) {
-      return path.join(protoPath, filename);
-    } else if (COMMON_PROTO_FILES.indexOf(filename) > -1) {
-      return path.join(googleProtoFilesDir, filename);
-    }
-    throw new Error(filename + ' could not be found in ' + protoPath);
-  }
+  // static _resolveFile(protoPath: string, filename: string) {
+  //   if (fs.existsSync(path.join(protoPath, filename))) {
+  //     return path.join(protoPath, filename);
+  //   } else if (COMMON_PROTO_FILES.indexOf(filename) > -1) {
+  //     return path.join(googleProtoFilesDir, filename);
+  //   }
+  //   throw new Error(filename + ' could not be found in ' + protoPath);
+  // }
 
   metadataBuilder(headers: OutgoingHttpHeaders) {
     const Metadata = this.grpc.Metadata;
@@ -322,38 +322,38 @@ export class GoogleProtoFilesRoot extends protobuf.Root {
 
   // Causes the loading of an included proto to check if it is a common
   // proto. If it is a common proto, use the bundled proto.
-  resolvePath(originPath: string, includePath: string) {
-    originPath = path.normalize(originPath);
-    includePath = path.normalize(includePath);
+  // resolvePath(originPath: string, includePath: string) {
+  //   originPath = path.normalize(originPath);
+  //   includePath = path.normalize(includePath);
+  //
+  //   // Fully qualified paths don't need to be resolved.
+  //   if (path.isAbsolute(includePath)) {
+  //     if (!fs.existsSync(includePath)) {
+  //       throw new Error('The include `' + includePath + '` was not found.');
+  //     }
+  //     return includePath;
+  //   }
+  //
+  //   if (COMMON_PROTO_FILES.indexOf(includePath) > -1) {
+  //     return path.join(googleProtoFilesDir, includePath);
+  //   }
+  //
+  //   return GoogleProtoFilesRoot._findIncludePath(originPath, includePath);
+  // }
 
-    // Fully qualified paths don't need to be resolved.
-    if (path.isAbsolute(includePath)) {
-      if (!fs.existsSync(includePath)) {
-        throw new Error('The include `' + includePath + '` was not found.');
-      }
-      return includePath;
-    }
-
-    if (COMMON_PROTO_FILES.indexOf(includePath) > -1) {
-      return path.join(googleProtoFilesDir, includePath);
-    }
-
-    return GoogleProtoFilesRoot._findIncludePath(originPath, includePath);
-  }
-
-  static _findIncludePath(originPath: string, includePath: string) {
-    originPath = path.normalize(originPath);
-    includePath = path.normalize(includePath);
-
-    let current = originPath;
-    let found = fs.existsSync(path.join(current, includePath));
-    while (!found && current.length > 0) {
-      current = current.substring(0, current.lastIndexOf(path.sep));
-      found = fs.existsSync(path.join(current, includePath));
-    }
-    if (!found) {
-      throw new Error('The include `' + includePath + '` was not found.');
-    }
-    return path.join(current, includePath);
-  }
+  // static _findIncludePath(originPath: string, includePath: string) {
+  //   originPath = path.normalize(originPath);
+  //   includePath = path.normalize(includePath);
+  //
+  //   let current = originPath;
+  //   let found = fs.existsSync(path.join(current, includePath));
+  //   while (!found && current.length > 0) {
+  //     current = current.substring(0, current.lastIndexOf(path.sep));
+  //     found = fs.existsSync(path.join(current, includePath));
+  //   }
+  //   if (!found) {
+  //     throw new Error('The include `' + includePath + '` was not found.');
+  //   }
+  //   return path.join(current, includePath);
+  // }
 }
